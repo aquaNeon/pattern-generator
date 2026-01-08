@@ -3,10 +3,16 @@ export const patterns = {
     const { cols, rows, cellSize, colors, shapeType, rotation, gap } = config;
     p.background(colors.bg);
     
+    // Center the grid in the canvas
+    const gridWidth = cols * cellSize + (cols - 1) * gap;
+    const gridHeight = rows * cellSize + (rows - 1) * gap;
+    const offsetX = (p.width - gridWidth) / 2;
+    const offsetY = (p.height - gridHeight) / 2;
+    
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
-        const x = i * (cellSize + gap) + cellSize / 2;
-        const y = j * (cellSize + gap) + cellSize / 2;
+        const x = offsetX + i * (cellSize + gap) + cellSize / 2;
+        const y = offsetY + j * (cellSize + gap) + cellSize / 2;
         const colorIndex = (i + j) % colors.palette.length;
         
         p.push();
@@ -24,7 +30,8 @@ export const patterns = {
             p.circle(0, 0, cellSize * 0.8);
             break;
           case 'triangle':
-            p.triangle(-cellSize/3, cellSize/3, cellSize/3, cellSize/3, 0, -cellSize/3);
+            const size = cellSize * 0.6;
+            p.triangle(-size/2, size/2, size/2, size/2, 0, -size/2);
             break;
           case 'wave':
             p.beginShape();
@@ -46,7 +53,6 @@ export const patterns = {
     p.noStroke();
     
     const totalBars = direction === 'horizontal' ? rows : cols;
-    const barLength = direction === 'horizontal' ? p.width : p.height;
     
     for (let i = 0; i < totalBars; i++) {
       const colorIndex = i % colors.palette.length;
@@ -54,10 +60,10 @@ export const patterns = {
       
       if (direction === 'horizontal') {
         const y = i * (thickness + gap);
-        p.rect(0, y, barLength, thickness);
+        p.rect(0, y, p.width, thickness);
       } else {
         const x = i * (thickness + gap);
-        p.rect(x, 0, thickness, barLength);
+        p.rect(x, 0, thickness, p.height);
       }
     }
   },
@@ -67,13 +73,19 @@ export const patterns = {
     p.background(colors.bg);
     p.noStroke();
     
+    // Center the checker pattern
+    const gridWidth = cols * cellSize + (cols - 1) * gap;
+    const gridHeight = rows * cellSize + (rows - 1) * gap;
+    const offsetX = (p.width - gridWidth) / 2;
+    const offsetY = (p.height - gridHeight) / 2;
+    
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
         const isOdd = (i + j) % 2 === 1;
         if (!isOdd) continue;
         
-        const x = i * (cellSize + gap);
-        const y = j * (cellSize + gap);
+        const x = offsetX + i * (cellSize + gap);
+        const y = offsetY + j * (cellSize + gap);
         const colorIndex = Math.floor(p.random(colors.palette.length));
         p.fill(colors.palette[colorIndex]);
         
@@ -90,6 +102,9 @@ export const patterns = {
     const { density, colors, shapeType, sizeMin, sizeMax, rotation } = config;
     p.background(colors.bg);
     p.noStroke();
+    
+    // Use a consistent seed for the same config
+    p.randomSeed(99);
     
     for (let i = 0; i < density; i++) {
       const x = p.random(p.width);

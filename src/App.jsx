@@ -5,6 +5,8 @@ import { patterns, presets } from './patterns';
 function App() {
   const canvasRef = useRef(null);
   const p5InstanceRef = useRef(null);
+  const configRef = useRef(null);
+  
   const [config, setConfig] = useState({
     pattern: 'grid',
     cols: 8,
@@ -24,6 +26,9 @@ function App() {
     }
   });
 
+  // Keep config in ref for p5 to access
+  configRef.current = config;
+
   useEffect(() => {
     const sketch = (p) => {
       p.setup = () => {
@@ -32,8 +37,9 @@ function App() {
       };
 
       p.draw = () => {
-        if (config.pattern && patterns[config.pattern]) {
-          patterns[config.pattern](p, config);
+        const currentConfig = configRef.current;
+        if (currentConfig.pattern && patterns[currentConfig.pattern]) {
+          patterns[currentConfig.pattern](p, currentConfig);
         }
         p.noLoop();
       };
@@ -51,6 +57,7 @@ function App() {
     };
   }, []);
 
+  // Trigger redraw when config changes
   useEffect(() => {
     if (p5InstanceRef.current) {
       p5InstanceRef.current.redraw();
